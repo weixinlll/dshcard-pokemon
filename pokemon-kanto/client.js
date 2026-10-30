@@ -523,7 +523,7 @@ window.__ModuleLoader__.load({id:'dsh-card-pokemon-frlg-stage',factory:require=>
       h('div',{className:'kanto-cast'},actors.map(person=>h(Portrait,{key:person.name,person,pokemon:person.pokemon,speaking:!speaker||person.name===speaker,reducedMotion})),mons.map((mon,i)=>h(Portrait,{key:'mon'+i,pokemon:true,reducedMotion,person:{name:mon.name||'',url:asset(ctx.tavernUi,`assets/pokemon/${isShinyMon(mon)?'shiny/':''}artwork/${mon.id||mon}.png`),shiny:isShinyMon(mon),shinySeed:mon.uid||mon.id,uid:mon.uid}}))),
       service?.effect?h('span',{key:service.effect.key,className:'kanto-safari-prop is-'+service.effect.kind,style:{animationDuration:service.effect.duration+'ms'},'aria-hidden':true}):null,
       notice?h('p',{className:'kanto-note',role:'status'},notice):null,
-      h('div',{className:'kanto-theater-box',onClick:e=>e.stopPropagation()},
+      h('div',{className:'kanto-theater-box',onClick:e=>{if(service||e.target.closest?.('button,a,input,select,textarea,summary'))e.stopPropagation();}},
         speaker?h('span',{className:'kanto-theater-name'},speaker):null,
         service?.summary?h('p',{className:'kanto-service-summary'},service.summary):null,
         narration?h('p',{className:'kanto-theater-text kanto-theater-narration'},narration):null,

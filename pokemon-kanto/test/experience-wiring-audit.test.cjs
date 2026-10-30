@@ -81,7 +81,8 @@ test('battle target filtering recognizes PP deficits and Full Restore status cur
 test('service controls stop theater advance and expose a return path to story mode', () => {
   const source = read('client.js');
   assert.match(source, /className:'kanto-theater',onClick:\(\)=>advance\?\.\(\)/);
-  assert.match(source, /className:'kanto-theater-box',onClick:e=>e\.stopPropagation\(\)/);
+  // Like a galgame, a click on the story text box advances; its controls and an open service scene keep the click.
+  assert.match(source, /className:'kanto-theater-box',onClick:e=>\{if\(service\|\|e\.target\.closest\?\.\('button,a,input,select,textarea,summary'\)\)e\.stopPropagation\(\);\}/);
   assert.match(source, /service\?\.choices\?\.length[\s\S]*onServiceChoice\?\.\(choice\)/);
   assert.match(source, /service\?h\('button',[\s\S]*'返回剧情'/);
   assert.match(source, /mode!=='story'\?button\('返回剧情',\(\)=>change\('story'\)\)/);
