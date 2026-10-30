@@ -183,6 +183,8 @@ test('only standalone markers become controls, leaving neighboring bubble lines 
 test('message action submits the whole settled turn for host validation',async()=>{
  const app=browserPlugin(),action=app.ui.messageAction;
  assert.equal(action.id,'kanto-check-battle');assert.equal(action.when({gameId:'game-1',settled:true}),true);
+  assert.equal(action.when({gameId:'game-1',settled:true,text:'小茂说：来比一场吧。'}),true);
+  assert.equal(action.when({gameId:'game-1',settled:true,text:'小茂向你发起挑战。\n\n【进入本轮战斗】\n'}),false,'the control line already offers the battle');
  assert.equal(action.when({gameId:'game-1',settled:false}),false);
  await action.run({gameId:'game-1',turn:7,settled:true});
  assert.ok(app.apiCalls.some(call=>call.route.endsWith('/enter-battle')&&call.data.natural===true&&call.data.turn===7&&!('naturalQuote' in call.data)));

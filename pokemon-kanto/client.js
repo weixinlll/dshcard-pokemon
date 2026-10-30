@@ -763,7 +763,9 @@ window.__ModuleLoader__.load({id:'dsh-card-pokemon-frlg-stage',factory:require=>
     // a spoken line breaks @bubble. Only a standalone control line is ours;
     // natural invitations use the message action and the native stage dock.
     ui.registerTextMarker?.({pattern:/^[\t ]*(?:【(?:查看训练家状态|打开背包|打开商店|查看任务|进入本轮战斗)】|进入本轮战斗)[\t ]*\r?$/gm,render:({gameId,turn,streaming,match})=>streaming?h('span',null,match):h(Entry,{ctx,gameId,turn,label:String(match).trim().replace(/[【】]/g,''),mode:markerMode(match)})});
-    ui.registerMessageAction?.({id:'kanto-check-battle',label:'接受剧情对战',when:({gameId,settled})=>Boolean(gameId&&settled),run:async({gameId,turn})=>{await ui.callHost(PLUGIN+'/enter-battle',{gameId,turn,natural:true});sessions.set(gameId,{...(sessions.get(gameId)||{}),actionDraft:null});open(ctx,gameId,'battle');}});
+    // A reply with the 【进入本轮战斗】 control line already has its entry; hosts that pass the reply text
+    // (DSH Tavern, message actions) let this button stay off those replies. Without text it shows as before.
+    ui.registerMessageAction?.({id:'kanto-check-battle',label:'接受剧情对战',when:({gameId,settled,text})=>Boolean(gameId&&settled)&&!/^[\t ]*(?:【进入本轮战斗】|进入本轮战斗)[\t ]*\r?$/m.test(String(text||'')),run:async({gameId,turn})=>{await ui.callHost(PLUGIN+'/enter-battle',{gameId,turn,natural:true});sessions.set(gameId,{...(sessions.get(gameId)||{}),actionDraft:null});open(ctx,gameId,'battle');}});
     ui.registerComposerAction?.({id:'kanto-native-battle',label:'关都剧场',when:({busy})=>!busy,run:({gameId})=>open(ctx,gameId,'story')});
   }};
 }});
