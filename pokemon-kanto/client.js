@@ -2,7 +2,7 @@
 window.__ModuleLoader__.load({id:'dsh-card-pokemon-frlg-stage',factory:require=>{
   const R=require('react'),h=R.createElement,{useEffect,useMemo,useRef,useState}=R;
   const PLUGIN='dsh-card-pokemon-frlg-stage',CHANNEL='kanto-mvu';
-  const ASSET_ROOT='/api/dsh-tavern/plugin-assets/'+PLUGIN+'/web/',VERSION='1.0.2';
+  const ASSET_ROOT='/api/dsh-tavern/plugin-assets/'+PLUGIN+'/web/',VERSION='1.0.3';
   const sessions=new Map(),listeners=new Set(),portraitAssignments=new Map(),staticRequests=new Map();
   const STATIC_REQUEST_LIMIT=24;
   const modes=new Set(['story','battle','party','bag','quests','shop','map']);

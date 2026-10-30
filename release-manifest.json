@@ -1,14 +1,14 @@
 {
-  "version": "1.0.2",
-  "bytes": 571108872,
-  "sha256": "8fc169e9a348ddee035a6da3b87f14ac631b97c85d0aebfc2ecf744132830be4",
-  "asset": "pokemon-frlg-1.0.2.dshcard",
-  "url": "https://github.com/weixinlll/dshcard-pokemon/releases/download/v1.0.2/pokemon-frlg-1.0.2.dshcard",
+  "version": "1.0.3",
+  "bytes": 571109138,
+  "sha256": "76ec339d29a6e782e653334b8b862fe6c54a40136e1188c52c7fc63e1e3f7900",
+  "asset": "pokemon-frlg-1.0.3.dshcard",
+  "url": "https://github.com/weixinlll/dshcard-pokemon/releases/download/v1.0.3/pokemon-frlg-1.0.3.dshcard",
   "pluginUpdate": {
-    "asset": "pokemon-kanto-1.0.2.zip",
-    "bytes": 2753103,
-    "sha256": "422877d367e4295b4320f8aa9358a5be685d46d2ab2ec5a1ef5de1007207fec2",
-    "url": "https://github.com/weixinlll/dshcard-pokemon/releases/download/v1.0.2/pokemon-kanto-1.0.2.zip",
+    "asset": "pokemon-kanto-1.0.3.zip",
+    "bytes": 2753370,
+    "sha256": "cfdc4193319e2a85fef0f04b7ddc419e09337ee9707a839e325b784191e16c52",
+    "url": "https://github.com/weixinlll/dshcard-pokemon/releases/download/v1.0.3/pokemon-kanto-1.0.3.zip",
     "note": "plugin code only (plugins/pokemon-kanto/); for updating an existing install, see docs/UPDATING.md"
   }
 }

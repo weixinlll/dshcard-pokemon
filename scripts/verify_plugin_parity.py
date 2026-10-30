@@ -2,8 +2,8 @@ import hashlib, zipfile, sys
 from pathlib import Path
 
 ROOT = Path(r'C:\Users\30625\dshcard-pokemon')
-full = ROOT / 'dist' / 'pokemon-frlg-1.0.2.dshcard'
-code = ROOT / 'dist' / 'pokemon-kanto-1.0.2.zip'
+full = ROOT / 'dist' / 'pokemon-frlg-1.0.3.dshcard'
+code = ROOT / 'dist' / 'pokemon-kanto-1.0.3.zip'
 PREFIX = 'plugins/pokemon-kanto/'
 
 def entries(path, prefix):
@@ -34,3 +34,4 @@ if differing:
     for k in differing[:10]:
         print('  差异:', k)
 sys.exit(0 if ok else 1)
+
