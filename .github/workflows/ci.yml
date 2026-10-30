@@ -28,7 +28,7 @@ jobs:
       - name: Wait for the pinned release asset
         shell: bash
         run: |
-          url=$(python -c "import json;print(json.load(open('release-manifest.json'))['url'])")
+          url=$(python -c "import json;print(json.load(open('release-manifest.json',encoding='utf-8'))['url'])")
           echo "waiting for $url"
           for i in $(seq 1 40); do
             code=$(curl -s -o /dev/null -w '%{http_code}' -L -r 0-1023 "$url" || true)

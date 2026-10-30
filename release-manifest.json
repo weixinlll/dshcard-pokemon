@@ -9,6 +9,6 @@
     "bytes": 2753103,
     "sha256": "422877d367e4295b4320f8aa9358a5be685d46d2ab2ec5a1ef5de1007207fec2",
     "url": "https://github.com/weixinlll/dshcard-pokemon/releases/download/v1.0.2/pokemon-kanto-1.0.2.zip",
-    "note": "只含 plugins/pokemon-kanto/，用于已安装用户的增量更新（docs/UPDATING.md）"
+    "note": "plugin code only (plugins/pokemon-kanto/); for updating an existing install, see docs/UPDATING.md"
   }
 }
