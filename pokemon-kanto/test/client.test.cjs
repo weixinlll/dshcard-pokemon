@@ -235,6 +235,31 @@ test('the in-stage battle marker is disabled once this battle is settled',async(
   assert.equal(app.apiCalls.some(call=>call.route.endsWith('/enter-battle')),false);
 });
 
+test('a lost battle with the whole party fainted says so on the stage and offers the center',async()=>{
+  const world={训练家:{金钱:100,徽章:[]},地图:{节点:'pallet',地点:'真新镇'},队伍:[{uid:'a',当前HP:0}],战斗:{状态:'finished',结果:'lose',已奖励:true},剧情:{行动提示:'当前场景不允许这个操作。'}};
+  const app=browserPlugin({mvu:{writable:true,turn:4,world,theater:{options:[{id:'heal',label:'宝可梦中心恢复',enabled:true}],dialogue:'小茂把精灵球收了回去。'}}});
+  const beat={kind:'line',text:'小茂笑了。',turn:4},input={gameId:'game-1',stage:{},beats:[beat],index:0,beat};
+  let stage=app.ui.stageView.render(input);app.render(stage.type,stage.props,'direct-stage');await tick();
+  stage=app.ui.stageView.render(input);const tree=app.render(stage.type,stage.props,'direct-stage');
+  const scene=walk(tree,node=>node.type?.name==='TheaterScene')[0];
+  assert.equal(scene.props.notice,'','the stale action hint gives way to the defeat notice');
+  const sceneTree=app.render(scene.type,scene.props,'direct-scene');
+  assert.ok(walk(sceneTree,node=>node.type==='p'&&[].concat(node.props.children).join('')==='队伍全部倒下了。').length);
+  const heal=walk(sceneTree,node=>node.type==='button'&&[].concat(node.props.children).join('')==='去宝可梦中心恢复')[0];
+  heal.props.onClick();await tick();
+  assert.ok(app.apiCalls.some(call=>call.route.endsWith('/scene')&&call.data.action==='heal'));
+});
+
+test('a lost battle shows no defeat notice once the party is healed',async()=>{
+  const world={训练家:{金钱:100,徽章:[]},地图:{节点:'pallet',地点:'真新镇'},队伍:[{uid:'a',当前HP:20}],战斗:{状态:'finished',结果:'lose',已奖励:true}};
+  const app=browserPlugin({mvu:{writable:true,turn:4,world,theater:{options:[],dialogue:''}}});
+  const beat={kind:'line',text:'小茂笑了。',turn:4},input={gameId:'game-1',stage:{},beats:[beat],index:0,beat};
+  let stage=app.ui.stageView.render(input);app.render(stage.type,stage.props,'direct-stage');await tick();
+  stage=app.ui.stageView.render(input);const tree=app.render(stage.type,stage.props,'direct-stage');
+  const scene=walk(tree,node=>node.type?.name==='TheaterScene')[0];
+  assert.equal(scene.props.defeat,null);
+});
+
 test('stage view draws cropped art and edits an RP action before explicitly sending it', async () => {
   const app = browserPlugin({mvu:{writable:true,turn:1,progression:{levelCap:41},shop:{available:true},world:{训练家:{金钱:300,徽章:[]},地图:{节点:'pallet',地点:'真新镇',轮次:1},战斗:{状态:'finished'},队伍:[]},theater:{person:{name:'大木博士'},pokemon:[],backgroundImage:'assets/backgrounds/lab.png',options:[{id:'travel',label:'前往1号道路',enabled:true,payload:{node:'route1'}}]}}});
   const line = { kind: 'line', speaker: '大木博士', text: '欢迎来到宝可梦世界。' };

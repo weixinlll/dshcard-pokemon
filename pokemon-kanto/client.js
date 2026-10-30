@@ -166,6 +166,7 @@ window.__ModuleLoader__.load({id:'dsh-card-pokemon-frlg-stage',factory:require=>
 .kanto-theater-controls button:disabled{opacity:.4;cursor:default}
 .kanto-theater-controls .dsh-tavern-stage-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;width:100%;color:inherit}
 .kanto-theater-controls .dsh-tavern-spacer{flex:1}
+.kanto-defeat{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 8px}.kanto-defeat p{margin:0;font-weight:600}
 .kanto-note{position:absolute;left:4%;top:14px;max-width:90%;margin:0;font-size:13px;color:#fff;background:#132e40d9;padding:6px 12px;border-radius:6px;pointer-events:none}
 .kanto-safari-prop{position:absolute;left:22%;top:53%;z-index:3;pointer-events:none;width:32px;height:32px;border-radius:50%;background:linear-gradient(#61945a 0 43%,#172e36 44% 56%,#fcf8de 57%);border:2px solid #172e36;box-shadow:0 0 20px #fff5;animation:kanto-safari-arc .85s cubic-bezier(.2,.6,.55,1) both}
 .kanto-safari-prop.is-bait{width:23px;height:20px;background:#ba8b4e;border-color:#6a4b2e;border-radius:30%}
@@ -489,7 +490,7 @@ window.__ModuleLoader__.load({id:'dsh-card-pokemon-frlg-stage',factory:require=>
     }
     return null;
   }
-  function TheaterScene({ctx,gameId,stage,theater,stageAssets,beat,beats,index,advance,footer,notice,onMode,onServiceChoice,sceneRef,scene,service,busy,playerName,battleOver=false,reducedMotion=false}){
+  function TheaterScene({ctx,gameId,stage,theater,stageAssets,beat,beats,index,advance,footer,notice,onMode,onServiceChoice,sceneRef,scene,service,busy,playerName,battleOver=false,defeat=null,reducedMotion=false}){
     const current=service||beat||(beats||[])[index],raw=String(current?.text||''),hidden=isStageDataRow(current,beats);
     const beatText=stripStagePayload(hidden?'':raw),theaterText=String(theater?.dialogue||'').trim();
     let text=beatText||theaterText||'……',narration='';
@@ -524,6 +525,7 @@ window.__ModuleLoader__.load({id:'dsh-card-pokemon-frlg-stage',factory:require=>
       service?.effect?h('span',{key:service.effect.key,className:'kanto-safari-prop is-'+service.effect.kind,style:{animationDuration:service.effect.duration+'ms'},'aria-hidden':true}):null,
       notice?h('p',{className:'kanto-note',role:'status'},notice):null,
       h('div',{className:'kanto-theater-box',onClick:e=>{if(service||e.target.closest?.('button,a,input,select,textarea,summary'))e.stopPropagation();}},
+        defeat&&!service?h('div',{className:'kanto-defeat',role:'status'},h('p',null,'队伍全部倒下了。'),defeat.heal?h('button',{type:'button',className:'kanto-action',disabled:busy,onClick:defeat.heal},'去宝可梦中心恢复'):h('p',null,'这里没有宝可梦中心，在输入框写下一步，让剧情带你去找。')):null,
         speaker?h('span',{className:'kanto-theater-name'},speaker):null,
         service?.summary?h('p',{className:'kanto-service-summary'},service.summary):null,
         narration?h('p',{className:'kanto-theater-text kanto-theater-narration'},narration):null,
@@ -552,6 +554,9 @@ window.__ModuleLoader__.load({id:'dsh-card-pokemon-frlg-stage',factory:require=>
     // A settled battle (result written or rewarded) cannot be entered again: enter-battle only recovers a
     // finished battle that has neither, so the story marker stops offering it rather than failing on click.
     const battleOver=finished&&(world.战斗.已奖励===true||Boolean(world.战斗.结果));
+    // A lost battle leaves the whole party fainted and nothing else happens; say so on the stage and offer
+    // the center here when there is one, instead of leaving only a greyed-out challenge to explain it.
+    const defeated=battleOver&&world.战斗.结果==='lose'&&!world.队伍?.some(mon=>mon.当前HP>0);
     // API 7 stage data carries the native BGM cue (including null for silence).
     // The host owns that player in chat and fullscreen; legacy plugin music is
     // a separate transport, so never start it alongside the native owner.
@@ -714,7 +719,7 @@ window.__ModuleLoader__.load({id:'dsh-card-pokemon-frlg-stage',factory:require=>
             h('label',null,h('input',{type:'checkbox',checked:world?.设置?.bondBattleEffects!==false,disabled:busy||!data?.writable||world?.战斗?.状态==='active',onChange:e=>setting({bondBattleEffects:e.target.checked})}),'羁绊闪避与要害辅助'),
             h('label',null,h('input',{type:'checkbox',checked:world?.设置?.道馆等级上限!==false,disabled:busy||!data?.writable||world?.战斗?.状态==='active',onChange:e=>setting({levelCap:e.target.checked})}),'道馆前等级上限'))))),
       h('div',{className:'kanto-stage-viewport'},mode==='story'
-        ?h(TheaterScene,{ctx,gameId,stage,theater,stageAssets,beat,beats,index,battleOver,scene:data?.presentation?.scene,service:shared.serviceScene,busy,reducedMotion:reducedEffects,playerName:world?.训练家?.姓名,onServiceChoice:prepare,advance:advanceScene,footer:readableStageFooter(footer,beats,index),notice:journal,onMode:requestMode,sceneRef})
+        ?h(TheaterScene,{ctx,gameId,stage,theater,stageAssets,beat,beats,index,battleOver,defeat:defeated?{heal:(heal=>heal?()=>prepare(heal):null)(options.find(option=>option.id==='heal'&&option.enabled!==false))}:null,scene:data?.presentation?.scene,service:shared.serviceScene,busy,reducedMotion:reducedEffects,playerName:world?.训练家?.姓名,onServiceChoice:prepare,advance:advanceScene,footer:readableStageFooter(footer,beats,index),notice:defeated?'':journal,onMode:requestMode,sceneRef})
         :h(BattleFrame,{ctx,gameId,mode,musicEnabled,musicManaged,effectsEnabled,animationSpeed,reducedEffects,onChange:change,onRefresh:refresh,onPrepare:prepare,onPreferences:value=>{if([1,2,4].includes(value.speed))setSpeed(value.speed);if(typeof value.effects==='boolean')setEffects(value.effects);if(typeof value.reducedEffects==='boolean')setReduced(value.reducedEffects);}})),
       h('div',{className:'kanto-stage-dock',onClick:e=>e.stopPropagation()},
         mode==='story'&&preview?h('div',{className:'kanto-stage-prompt',role:'region','aria-label':'准备行动'},h('label',{className:'kanto-draft-label'},'编辑这次行动',h('textarea',{'aria-label':'行动草稿',value:preview.text,maxLength:4000,onChange:e=>setPreview({...preview,text:e.target.value}),disabled:busy})),h('div',{className:'kanto-draft-actions'},h('small',null,'可以改写。只有点发送，剧情才会继续。'),button(busy?'正在发送…':'发送并继续剧情',confirm,busy||!data?.writable||!preview.text.trim(),'kanto-action is-primary'),button('放到输入框',()=>{ui.setInput?.({gameId,text:preview.text});setPreview(null);}),button('取消',()=>setPreview(null)))):null,
