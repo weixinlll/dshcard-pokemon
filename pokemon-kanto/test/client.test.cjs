@@ -222,6 +222,19 @@ test('the in-stage battle marker never falls back to a trainer RP draft',async()
   assert.equal(tree.props['data-kanto-mode'],'battle');
 });
 
+test('the in-stage battle marker is disabled once this battle is settled',async()=>{
+  const app=browserPlugin({mvu:{writable:true,turn:4,world:{训练家:{金钱:100,徽章:[]},地图:{节点:'pallet',地点:'真新镇'},队伍:[],战斗:{状态:'finished',结果:'lose',已奖励:true}},theater:{options:[],dialogue:'小茂把精灵球收了回去。'}}});
+  const beat={kind:'line',text:'【进入本轮战斗】',turn:4},input={gameId:'game-1',stage:{},beats:[beat],index:0,beat};
+  let stage=app.ui.stageView.render(input);app.render(stage.type,stage.props,'direct-stage');await tick();
+  stage=app.ui.stageView.render(input);const tree=app.render(stage.type,stage.props,'direct-stage');
+  const scene=walk(tree,node=>node.type?.name==='TheaterScene')[0];
+  const sceneTree=app.render(scene.type,scene.props,'direct-scene');
+  assert.equal(walk(sceneTree,node=>node.type==='button'&&[].concat(node.props.children).join('')==='进入本轮战斗').length,0);
+  const done=walk(sceneTree,node=>node.type==='button'&&[].concat(node.props.children).join('')==='本轮战斗已结束')[0];
+  assert.equal(done.props.disabled,true);
+  assert.equal(app.apiCalls.some(call=>call.route.endsWith('/enter-battle')),false);
+});
+
 test('stage view draws cropped art and edits an RP action before explicitly sending it', async () => {
   const app = browserPlugin({mvu:{writable:true,turn:1,progression:{levelCap:41},shop:{available:true},world:{训练家:{金钱:300,徽章:[]},地图:{节点:'pallet',地点:'真新镇',轮次:1},战斗:{状态:'finished'},队伍:[]},theater:{person:{name:'大木博士'},pokemon:[],backgroundImage:'assets/backgrounds/lab.png',options:[{id:'travel',label:'前往1号道路',enabled:true,payload:{node:'route1'}}]}}});
   const line = { kind: 'line', speaker: '大木博士', text: '欢迎来到宝可梦世界。' };
