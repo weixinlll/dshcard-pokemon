@@ -1,6 +1,6 @@
 {
   "name": "dsh-card-pokemon-frlg-stage",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "火红叶绿关都MVU原生剧场、单打双打与本地结算",
   "main": "index.mjs",

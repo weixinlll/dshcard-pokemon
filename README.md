@@ -16,16 +16,29 @@
 ## 下载与开始游玩
 
 1. 安装并启动 [DSH Tavern](https://github.com/flizzywine/dsh-tavern)，按其文档完成模型连接配置。本卡要求宿主提供 **Tavern API 4**，包括原生 MVU 结算提供者；以宿主实际能力为准。
-2. 打开本项目的 **[最新发行版](https://github.com/weixinlll/dshcard-pokemon/releases/latest)**，下载 `pokemon-frlg-1.0.1.dshcard`。资源随卡提供，文件约 **545 MiB**；不要下载 GitHub 自动生成的 Source code 代替它。
+2. 打开本项目的 **[最新发行版](https://github.com/weixinlll/dshcard-pokemon/releases/latest)**，下载 `pokemon-frlg-1.0.2.dshcard`。资源随卡提供，文件约 **545 MiB**；不要下载 GitHub 自动生成的 Source code 代替它。
 3. 在 DSH Tavern 的卡片管理／人物卡导入入口选择该文件。包内含人物卡、插件，以及人物／场景／音乐、动态精灵、原创演出材质三个资源包，无须另外运行安装器或覆盖宿主文件。
 4. 新开本卡游玩，等待开场与结算完成，选择初始伙伴。可以点击舞台入口，也可以直接输入「选择小火龙」「前往常青市」「寻找皮卡丘」等行动；地点通行与遭遇仍受当前剧情、地图和队伍条件限制。
 5. 出现合法邀约后点「接受剧情对战／进入本轮战斗」。战斗中亲自选择招式、道具、换人或逃跑。结束后结果直接保存到 MVU，同一故事轮可以继续主动对战，不需要把战果再发送给模型。
 
 更新前请先用 DSH Tavern 自带功能备份旧局。旧局与新卡的兼容问题请附版本和复现步骤反馈；本仓库不会读取或上传玩家存档。
 
+### 更新已有安装
+
+已经在玩的用户**不需要每次重下 545 MiB**。卡片里约 530 MiB 是几乎不变的媒体，会变的是约 14 MiB 的插件代码（压缩后 2.6 MiB）。
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\update-plugin.ps1
+```
+
+脚本会比对版本、下载 `pokemon-kanto-<版本>.zip`、备份旧插件并覆盖，最后提示你重启 DSH。存档、MVU 变量和剧情记忆都在插件目录之外，不会被碰到。
+
+**什么时候需要完整重装**：Release 说明里提到新增立绘／背景／音乐／动态精灵时。判断方法很简单——附件里有 `pokemon-kanto-*.zip` 就说明这次可以只更新代码。
+
+完整步骤、手动更新方式和回滚办法见 **[docs/UPDATING.md](docs/UPDATING.md)**。
 ### 下载完整性
 
-发行版附 `SHA256SUMS.txt`。Windows 可以用 `Get-FileHash .\pokemon-frlg-1.0.1.dshcard -Algorithm SHA256`，macOS / Linux 可以用 `shasum -a 256 pokemon-frlg-1.0.1.dshcard`，与清单核对。源码中的 [release-manifest.json](release-manifest.json) 也固定了首发资源的版本与校验值。
+发行版附 `SHA256SUMS.txt`。Windows 可以用 `Get-FileHash .\pokemon-frlg-1.0.2.dshcard -Algorithm SHA256`，macOS / Linux 可以用 `shasum -a 256 pokemon-frlg-1.0.2.dshcard`，与清单核对。源码中的 [release-manifest.json](release-manifest.json) 也固定了首发资源的版本与校验值。
 
 ## 可以玩到什么
 
@@ -58,7 +71,7 @@
 
 ## 常见问题
 
-**小茂的 `@bubble` 直接露出来，或进舞台后有两首 BGM？** 请下载当前 **1.0.1 正式版（`v1.0.1`）**，旧的 `v1.0.0` 上传包已标记为旧预览。此次修复取消了对整句台词的按钮替换，邀请通过台词外的「接受剧情对战」或舞台入口操作；不新增气泡开关。新版音乐由本体管理，插件不会改变你的本体音乐设置。
+**小茂的 `@bubble` 直接露出来，或进舞台后有两首 BGM？** 请下载当前 **1.0.2 正式版（`v1.0.2`）**，旧的 `v1.0.0` 上传包已标记为旧预览。此次修复取消了对整句台词的按钮替换，邀请通过台词外的「接受剧情对战」或舞台入口操作；不新增气泡开关。新版音乐由本体管理，插件不会改变你的本体音乐设置。
 
 **点战斗没有反应／提示正在结算？** 先确认本轮正文和后台任务已经结束、已领取可战斗伙伴、当前存在未结束的合法遭遇。不要连续反复点击。如果一直停住，请保存本体诊断，记录卡版本、宿主版本、操作与错误文字，然后[提交问题](https://github.com/weixinlll/dshcard-pokemon/issues/new/choose)。不要把完整聊天和凭据直接公开。
 
@@ -91,14 +104,14 @@ npm start
 
 打开 `http://127.0.0.1:4177`。这只是本地战斗／管理预览，**不是完整 DSH AI 剧情环境**；原生舞台、模型叙事和宿主 MVU 接口还需在 DSH Tavern 验证。
 
-已经下载角色卡时，可用 `python scripts/fetch_assets.py --archive /path/to/pokemon-frlg-1.0.1.dshcard`，避免重复下载。资源脚本先验证固定哈希，再解出允许的资源目录；不会访问 DSH 安装目录。
+已经下载角色卡时，可用 `python scripts/fetch_assets.py --archive /path/to/pokemon-frlg-1.0.2.dshcard`，避免重复下载。资源脚本先验证固定哈希，再解出允许的资源目录；不会访问 DSH 安装目录。
 
 ```sh
 python scripts/check_repository.py
 python scripts/build_card.py
 ```
 
-新构建位于 `dist/pokemon-frlg-1.0.1.dshcard`，附独立校验报告；开发构建的哈希可与首次发行不同，以其生成的报告为准。源码包未带媒体时不能离线构建。CI 在 PR、发布及手动运行时执行，先取已发布的固定资源再运行测试。
+新构建位于 `dist/pokemon-frlg-1.0.2.dshcard`，附独立校验报告；开发构建的哈希可与首次发行不同，以其生成的报告为准。源码包未带媒体时不能离线构建。CI 在 PR、发布及手动运行时执行，先取已发布的固定资源再运行测试。
 
 ## 目录
 
